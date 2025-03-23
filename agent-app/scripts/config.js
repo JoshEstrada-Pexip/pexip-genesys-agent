@@ -7,7 +7,7 @@ export default {
 
     // Publicly accessible location where the admin-app files are hosted.
     // This is different than the Pexip conference node value below.
-    prodUri:  'https://joshestrada.github.io/pexip-genesys-agent/',
+    prodUri:  'https://github.com/joshestrada/pexip-genesys-agent/blob/main/agent-app/index.html',
 
     // Id for the video DOM element. Only change this if you customize index.html.
     videoElementId: "pexip-video-container",
