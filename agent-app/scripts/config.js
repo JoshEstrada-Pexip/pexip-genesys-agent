@@ -7,7 +7,7 @@ export default {
 
     // Publicly accessible location where the admin-app files are hosted.
     // This is different than the Pexip conference node value below.
-    prodUri:  'https://joshestrada.github.io/pexip-genesys-agent/index.html',
+    prodUri:  'https://joshestrada.github.io/pexip-genesys-agent/',
 
     // Id for the video DOM element. Only change this if you customize index.html.
     videoElementId: "pexip-video-container",
@@ -28,7 +28,7 @@ export default {
         conferencePrefix: "gen",
 
         // External domain for Pexip Infinity Edge/Transcoding nodes.
-        conferenceNode: "edge1-useast.gcp.pexsupport.com",
+        conferenceNode: "gcp.pexsupport.com",
 
         // Conference PIN. Must match the PIN number set by Pexip Infinity local policy for ad-hoc conference creation.
         conferencePin: "2025"
