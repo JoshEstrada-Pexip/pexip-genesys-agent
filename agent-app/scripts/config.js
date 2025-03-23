@@ -16,7 +16,7 @@ export default {
         // Genesys Cloud region
         // 'mypurecloud.com', 'usw2.pure.cloud', 'mypurecloud.ie', 'euw2.pure.cloud', 'mypurecloud.com.au'
         // See https://help.mypurecloud.com/articles/aws-regions-for-genesys-cloud-deployment/ for all options
-        region: 'mypurecloud.com',
+        region: 'usw2.pure.cloud',
 
         // OAuth Client ID
         // Created in "Create a Token Implicit OAuth Grant for Genesys Cloud deployment" step
