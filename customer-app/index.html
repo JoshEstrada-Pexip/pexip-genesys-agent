@@ -31,11 +31,10 @@
         let sessionId = window.crypto.randomUUID().replaceAll("-", "");
         let customerName = person.name.first[0] + person.name.last.replaceAll(" ", "-");
         let customerId = `${person.name.last[0].toUpperCase()}${Math.floor(Math.random() * 100000000)}`;
-        // Use window.location.protocol to dynamically determine http vs https
-        let url = `${window.location.protocol}//${pexip_domain}/webapp/#/?conference=${pexip_conference_prefix}${sessionId}&name=${customerName}%20${customerId}&callType=video&role=guest&pin=${pexip_pin}`;
+        let url = `https://${pexip_domain}/webapp/#/?conference=${pexip_conference_prefix}${sessionId}&name=${customerName}%20${customerId}&callType=video&role=guest&pin=${pexip_pin}`;
         console.log(url);
         // Use direct assignment to location.href for the new window
-        sessionWindow.location.href = url;
+        sessionWindow= url;
       });
       xhr.open("GET", "https://randomuser.me/api/?nat=us,gb");
       xhr.send();
