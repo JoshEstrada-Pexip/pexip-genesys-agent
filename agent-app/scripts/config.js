@@ -28,7 +28,7 @@ export default {
         conferencePrefix: "gen",
 
         // External domain for Pexip Infinity Edge/Transcoding nodes.
-        conferenceNode: "gcp.pexsupport.com",
+        conferenceNode: "edge1-useast.gcp.pexsupport.com",
 
         // Conference PIN. Must match the PIN number set by Pexip Infinity local policy for ad-hoc conference creation.
         conferencePin: "2025"
