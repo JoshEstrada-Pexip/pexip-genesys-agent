@@ -34,7 +34,6 @@
         let url = `https://${pexip_domain}/webapp/#/?conference=${pexip_conference_prefix}${sessionId}&name=${customerName}%20${customerId}&callType=video&role=guest&pin=${pexip_pin}`;
         console.log(url);
         // Use direct assignment to location.href for the new window
-        sessionWindow= url;
       });
       xhr.open("GET", "https://randomuser.me/api/?nat=us,gb");
       xhr.send();
