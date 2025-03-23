@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Initiate a Test Session</title>
+  <link rel="stylesheet" type="text/css" href="./styles/base.css">
+</head>
+
+<body>
+
+  <div class="form">
+    <button id="btn-init-test-session" class="submit" type="submit">Initiate Test Session</button>
+  </div>
+
+  <script type="text/javascript">
+    // NOTE: Set the following three values to match your self-host Pexip Infinity installation.
+    // External domain for Pexip Infinity Edge/Transcoding nodes.
+    let pexip_domain = "https://pexip.example.com";
+    // Used to identify the conference attendee for proper handling by Pexip Infinity local policy.
+    let pexip_conference_prefix = "abc";
+    // Conference PIN. Must match the PIN number set by Pexip Infinity local policy for ad-hoc conference creation.
+    let pexip_pin = "1234";
+
+    let init_test_session_btn = document.getElementById('btn-init-test-session');
+    init_test_session_btn.onclick = () => {
+      // Generates a random session UUID, customer name, and customer id, then opens a new Pexip video session.
+      let sessionWindow = window.open();
+      let xhr = new XMLHttpRequest();
+      xhr.addEventListener("load", (evt) => {
+        let person = JSON.parse(evt.target.response).results[0];
+        let sessionId = window.crypto.randomUUID().replaceAll("-", "");
+        let customerName = person.name.first[0] + person.name.last.replaceAll(" ", "-");
+        let customerId = `${person.name.last[0].toUpperCase()}${Math.floor(Math.random() * 100000000)}`;
+        let url = `${pexip_domain}/webapp/#/?conference=${pexip_conference_prefix}${sessionId}&name=${customerName}%20${customerId}&callType=video&role=guest&pin=${pexip_pin}`;
+        console.log(url);
+        sessionWindow.location = url;
+      });
+      xhr.open("GET", "https://randomuser.me/api/?nat=us,gb");
+      xhr.send();
+    }
+  </script>
+</body>
+</html>
