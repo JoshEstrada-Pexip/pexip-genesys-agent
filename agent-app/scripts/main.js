@@ -83,15 +83,58 @@ client.loginImplicitGrant(
     
     const interval = setInterval(() => {
       attempts++;
-      const widgetBtn = document.getElementById("ember2049");
-      console.log(`Checking for ember2049 element (attempt ${attempts}/${maxAttempts}):`, widgetBtn ? 'Found' : 'Not found');
+      
+      // Look for the element by class name and attributes instead of ID
+      // Based on the screenshot, we're looking for elements related to interactions
+      let widgetBtn = null;
+      
+      // Method 1: Try to find by specific class combinations
+      const interactionButtons = document.querySelectorAll('.interaction-url-work-item-button, [aria-label="Get Interaction URL"]');
+      if (interactionButtons.length > 0) {
+        widgetBtn = interactionButtons[0];
+        console.log('Found interaction button by class/aria-label');
+      }
+      
+      // Method 2: Try to find by container class and then button inside
+      if (!widgetBtn) {
+        const interactionContainers = document.querySelectorAll('.interaction-container, .interactions-panel-sizer');
+        for (const container of interactionContainers) {
+          const buttons = container.querySelectorAll('button');
+          if (buttons.length > 0) {
+            widgetBtn = buttons[0];
+            console.log('Found interaction button inside container');
+            break;
+          }
+        }
+      }
+      
+      // Method 3: Look for any button with "interaction" in its class or ID
+      if (!widgetBtn) {
+        const allButtons = document.querySelectorAll('button');
+        for (const btn of allButtons) {
+          if (btn.id.includes('interaction') || 
+              (btn.className && btn.className.includes('interaction')) ||
+              (btn.getAttribute('aria-describedby') && btn.getAttribute('aria-describedby').includes('interaction'))) {
+            widgetBtn = btn;
+            console.log('Found interaction button by partial match');
+            break;
+          }
+        }
+      }
+      
+      console.log(`Checking for interaction button (attempt ${attempts}/${maxAttempts}):`, widgetBtn ? 'Found' : 'Not found');
       
       if (widgetBtn) {
-        console.log('Initial state of ember2049:', {
+        console.log('Found element:', widgetBtn);
+        console.log('Element details:', {
+          tagName: widgetBtn.tagName,
+          id: widgetBtn.id,
+          className: widgetBtn.className,
+          ariaLabel: widgetBtn.getAttribute('aria-label'),
+          ariaDescribedby: widgetBtn.getAttribute('aria-describedby'),
           display: widgetBtn.style.display,
           visibility: widgetBtn.style.visibility,
           hidden: widgetBtn.hidden,
-          classList: Array.from(widgetBtn.classList),
           parentDisplay: widgetBtn.parentElement ? widgetBtn.parentElement.style.display : 'No parent'
         });
         
@@ -117,7 +160,7 @@ client.loginImplicitGrant(
         
         // Add a small delay before clicking to ensure the display change takes effect
         setTimeout(() => {
-          console.log('Attempting to click ember2049');
+          console.log('Attempting to click interaction button');
           try {
             // Try multiple ways to trigger the click
             widgetBtn.click(); // Standard click
@@ -139,7 +182,7 @@ client.loginImplicitGrant(
         clearInterval(interval);
         console.log('Auto-launch interval cleared');
       } else if (attempts >= maxAttempts) {
-        console.log('Maximum attempts reached. Could not find ember2049 element.');
+        console.log('Maximum attempts reached. Could not find interaction button.');
         clearInterval(interval);
       }
     }, 500);
