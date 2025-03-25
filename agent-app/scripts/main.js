@@ -74,11 +74,17 @@ client.loginImplicitGrant(
 }).then(data => {
     console.log('Finished Setup');
 
-    //Try to auto launch to the integration tab to open widget on call
+    // Try to auto launch to the integration tab to open widget on call
     console.log('Starting auto-launch process for integration tab');
+    
+    // More persistent approach - keep checking for longer
+    let attempts = 0;
+    const maxAttempts = 60; // Try for up to 30 seconds (60 * 500ms)
+    
     const interval = setInterval(() => {
+      attempts++;
       const widgetBtn = document.getElementById("ember2049");
-      console.log('Checking for ember2049 element:', widgetBtn ? 'Found' : 'Not found');
+      console.log(`Checking for ember2049 element (attempt ${attempts}/${maxAttempts}):`, widgetBtn ? 'Found' : 'Not found');
       
       if (widgetBtn) {
         console.log('Initial state of ember2049:', {
@@ -89,9 +95,19 @@ client.loginImplicitGrant(
           parentDisplay: widgetBtn.parentElement ? widgetBtn.parentElement.style.display : 'No parent'
         });
         
-        // Make the element visible first
+        // Try multiple approaches to make the element visible
         widgetBtn.style.display = "block";
-        widgetBtn.hidden = false; // Also remove the hidden attribute if present
+        widgetBtn.hidden = false;
+        widgetBtn.style.visibility = "visible";
+        
+        // Also try to make parent elements visible if needed
+        let parent = widgetBtn.parentElement;
+        while (parent) {
+          parent.style.display = "block";
+          parent.hidden = false;
+          parent.style.visibility = "visible";
+          parent = parent.parentElement;
+        }
         
         console.log('After visibility changes:', {
           display: widgetBtn.style.display,
@@ -102,12 +118,29 @@ client.loginImplicitGrant(
         // Add a small delay before clicking to ensure the display change takes effect
         setTimeout(() => {
           console.log('Attempting to click ember2049');
-          widgetBtn.click();
-          console.log('Click event dispatched');
+          try {
+            // Try multiple ways to trigger the click
+            widgetBtn.click(); // Standard click
+            console.log('Standard click dispatched');
+            
+            // Also try programmatic event dispatch as backup
+            const clickEvent = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true
+            });
+            widgetBtn.dispatchEvent(clickEvent);
+            console.log('Event-based click dispatched');
+          } catch (err) {
+            console.error('Error clicking element:', err);
+          }
         }, 100);
         
         clearInterval(interval);
         console.log('Auto-launch interval cleared');
+      } else if (attempts >= maxAttempts) {
+        console.log('Maximum attempts reached. Could not find ember2049 element.');
+        clearInterval(interval);
       }
     }, 500);
 }).catch(e => console.log('Error during setup:', e));
