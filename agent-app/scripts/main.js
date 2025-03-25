@@ -74,4 +74,17 @@ client.loginImplicitGrant(
 }).then(data => {
     console.log('Finished Setup');
 
+    //Try to auto launch to the integration tab to open widget on call
+    const interval = setInterval(() => {
+      const widgetBtn = document.getElementById("ember2049");
+      if (widgetBtn) {
+        // Make the element visible first
+        widgetBtn.style.display = "block";
+        // Add a small delay before clicking to ensure the display change takes effect
+        setTimeout(() => {
+          widgetBtn.click();
+        }, 100);
+        clearInterval(interval);
+      }
+    }, 500);
 }).catch(e => console.log(e));
