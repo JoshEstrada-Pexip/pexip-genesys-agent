@@ -31,36 +31,65 @@ client.loginImplicitGrant(
     agent = currentUser;
     return conversationsApi.getConversation(conversationId);
 }).then((conversation) => {
-    // ADD HERE: Function to show the RBFCU Agent Widget
-    function showRBFCUAgentWidget() {
-        // Try to click the RBFCU Agent Widget button first
+    // ADD THIS FUNCTION: Show RBFCU Agent Widget in iframe
+    function showRBFCUAgentWidgetInIframe() {
+        console.log("Attempting to show RBFCU Agent Widget...");
+        
+        // First try to find the button in the parent document
         const widgetButton = document.querySelector('button[aria-label="RBFCU Agent Widget"]');
         if (widgetButton) {
-            console.log("Found the RBFCU Agent Widget button, clicking it...");
+            console.log("Found RBFCU button in parent document, clicking it...");
             widgetButton.click();
-            return;
+            return true;
         }
         
-        // If button not found, directly modify the panel's visibility
+        // Look for the panel in the parent document
         const hiddenPanel = document.querySelector('.sub-panel-wrapper.hidden.no-width');
         if (hiddenPanel) {
-            console.log("Found the hidden panel, making it visible...");
-            // Remove the classes that hide the panel
+            console.log("Found hidden panel in parent document, showing it...");
             hiddenPanel.classList.remove('hidden', 'no-width');
             
-            // Find the contextual div inside and update its visibility
             const contextualDiv = hiddenPanel.querySelector('[aria-hidden="true"][style*="display: none"]');
             if (contextualDiv) {
                 contextualDiv.setAttribute('aria-hidden', 'false');
-                contextualDiv.style.display = '';  // Remove the display:none
+                contextualDiv.style.display = '';
+            }
+            return true;
+        }
+        
+        // Find all iframes and try to access each one
+        const iframes = document.querySelectorAll('iframe');
+        console.log(`Found ${iframes.length} iframes on the page`);
+        
+        for (let i = 0; i < iframes.length; i++) {
+            try {
+                const iframe = iframes[i];
+                console.log(`Checking iframe #${i}:`, iframe.src || iframe.title);
+                
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                const iframeButton = iframeDoc.querySelector('button[aria-label="RBFCU Agent Widget"]');
+                
+                if (iframeButton) {
+                    console.log("Found RBFCU button in iframe, clicking it...");
+                    iframeButton.click();
+                    return true;
+                }
+            } catch (e) {
+                console.log(`Cannot access iframe #${i} due to cross-origin policy`);
             }
         }
+        
+        console.log("Could not find RBFCU Widget elements to interact with");
+        return false;
     }
     
-    // Give the UI a moment to fully load before attempting to show the widget
-    setTimeout(showRBFCUAgentWidget, 1000);
+    // Add a delay to ensure the UI is loaded before trying to show the widget
+    setTimeout(() => {
+        const result = showRBFCUAgentWidgetInIframe();
+        console.log("Widget show attempt result:", result);
+    }, 3000);  // 3 second delay
     
-    // Continue with the existing code
+    // Continue with the rest of your existing code
     let videoElement = document.getElementById(config.videoElementId);
     let confNode = config.pexip.conferenceNode;
     let displayName = `Agent: ${agent.name}`;
