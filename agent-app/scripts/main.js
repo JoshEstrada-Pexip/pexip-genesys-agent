@@ -75,16 +75,39 @@ client.loginImplicitGrant(
     console.log('Finished Setup');
 
     //Try to auto launch to the integration tab to open widget on call
+    console.log('Starting auto-launch process for integration tab');
     const interval = setInterval(() => {
       const widgetBtn = document.getElementById("ember2049");
+      console.log('Checking for ember2049 element:', widgetBtn ? 'Found' : 'Not found');
+      
       if (widgetBtn) {
+        console.log('Initial state of ember2049:', {
+          display: widgetBtn.style.display,
+          visibility: widgetBtn.style.visibility,
+          hidden: widgetBtn.hidden,
+          classList: Array.from(widgetBtn.classList),
+          parentDisplay: widgetBtn.parentElement ? widgetBtn.parentElement.style.display : 'No parent'
+        });
+        
         // Make the element visible first
         widgetBtn.style.display = "block";
+        widgetBtn.hidden = false; // Also remove the hidden attribute if present
+        
+        console.log('After visibility changes:', {
+          display: widgetBtn.style.display,
+          visibility: widgetBtn.style.visibility,
+          hidden: widgetBtn.hidden
+        });
+        
         // Add a small delay before clicking to ensure the display change takes effect
         setTimeout(() => {
+          console.log('Attempting to click ember2049');
           widgetBtn.click();
+          console.log('Click event dispatched');
         }, 100);
+        
         clearInterval(interval);
+        console.log('Auto-launch interval cleared');
       }
     }, 500);
-}).catch(e => console.log(e));
+}).catch(e => console.log('Error during setup:', e));
