@@ -17,7 +17,7 @@
     // External domain for Pexip Infinity Edge/Transcoding nodes.
     let pexip_domain = "https://pxpconfdfwprd01.connect.rbfcu.org/";
     // Used to identify the conference attendee for proper handling by Pexip Infinity local policy.
-    let pexip_conference_prefix = "gen";
+    let pexip_conference_prefix = "gen_Branch10_TestInbound";
     // Conference PIN. Must match the PIN number set by Pexip Infinity local policy for ad-hoc conference creation.
     let pexip_pin = "2021";
 
@@ -31,7 +31,7 @@
         let sessionId = window.crypto.randomUUID().replaceAll("-", "");
         let customerName = person.name.first[0] + person.name.last.replaceAll(" ", "-");
         let customerId = `${person.name.last[0].toUpperCase()}${Math.floor(Math.random() * 100000000)}`;
-        let url = `${pexip_domain}/webapp/#/?conference=${pexip_conference_prefix}${sessionId}&name=${customerName}%20${customerId}&callType=video&role=guest&pin=${pexip_pin}`;
+        let url = `${pexip_domain}/webapp/#/?conference=${pexip_conference_prefix}&name=${customerName}%20${customerId}&callType=video&role=guest&pin=${pexip_pin}`;
         console.log(url);
         sessionWindow.location = url;
       });
