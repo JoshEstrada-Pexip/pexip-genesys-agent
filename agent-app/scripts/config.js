@@ -25,7 +25,7 @@ export default {
 
     pexip: {
         // Used to identify the conference attendee for proper handling by Pexip Infinity local policy.
-        conferencePrefix: "app_",
+        conferencePrefix: "",
 
         // External domain for Pexip Infinity Edge/Transcoding nodes.
         conferenceNode: "pxpconfdfwprd01.connect.rbfcu.org",
