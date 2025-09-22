@@ -20,7 +20,7 @@ export default {
 
         // OAuth Client ID
         // Created in "Create a Token Implicit OAuth Grant for Genesys Cloud deployment" step
-        oauthClientID: '9708dcf4-5e6b-4b2e-9639-0b91c63b8089'
+        oauthClientID: 'b1ba141a-ca8c-44c6-b01b-e83c88da4230'
     },
 
     pexip: {
