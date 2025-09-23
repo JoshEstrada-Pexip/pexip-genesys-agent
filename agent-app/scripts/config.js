@@ -19,7 +19,7 @@ export default {
         region: 'usw2.pure.cloud',
 
         // OAuth Client ID
-        // Created in "Create a Token Implicit OAuth Grant for Genesys Cloud deployment" step
+        // Created in "Create a Token Implicit OAuth Grant for Genesys Cloud deployment" stepv1
         oauthClientID: 'b1ba141a-ca8c-44c6-b01b-e83c88da4230'
     },
 
