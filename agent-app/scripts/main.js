@@ -18,6 +18,65 @@ let clientApp = new ClientApp({
 
 let conversationId = '';
 let agent = null;
+let pexrtcWrapper = null;
+let handleMuteCall = null;
+let handleHold = null;
+let handleEndCall = null;
+let muteState = false;
+let onHoldState = false;
+
+function getActiveCall(agentParticipant) {
+    if (agentParticipant && agentParticipant.calls) {
+        const activeCall = agentParticipant.calls.find(call => 
+            call.state === "connected"
+        );
+        return activeCall || null;
+    }
+    return null;
+}
+
+function handleCallEvent(callEvent) {
+    const agentParticipant = callEvent?.eventBody?.participants?.find(p => 
+        p.purpose === "agent" && 
+        p.state !== "terminated" &&
+        p.user?.id === agent.id
+    );
+
+    const customerParticipant = callEvent?.eventBody?.participants?.find(p =>
+        p.purpose === "customer" &&
+        p.state !== "terminated"
+    );
+
+    if (!agentParticipant || !customerParticipant) {
+        console.warn('No agent or customer participant found in call event');
+        return;
+    }
+
+    if (agentParticipant.state === "disconnected") {
+        if (agentParticipant.disconnectType === "client") {
+            handleEndCall(true);
+        }
+        if (agentParticipant.disconnectType === "transfer") {
+            handleEndCall(false);
+        }
+        if (agentParticipant.disconnectType === "peer") {
+            handleEndCall(false);
+        }
+        return;
+    }
+
+    if (muteState !== agentParticipant.muted) {
+        muteState = agentParticipant.muted ?? false;
+        if (!onHoldState) {
+            handleMuteCall(muteState);
+        }
+    }
+
+    if (onHoldState !== agentParticipant.held) {
+        onHoldState = agentParticipant.held ?? false;
+        handleHold(onHoldState);
+    }
+}
 
 const urlParams = new URLSearchParams(window.location.search);
 conversationId = urlParams.get('conversationid');
@@ -48,21 +107,40 @@ client.loginImplicitGrant(
 
     let prefixedConfAlias = `${config.pexip.conferencePrefix}${confAlias}`;
 
-    let pexrtcWrapper = new PexRtcWrapper(videoElement, confNode, prefixedConfAlias, displayName, pin);
+    pexrtcWrapper = new PexRtcWrapper(videoElement, confNode, prefixedConfAlias, displayName, pin);
     pexrtcWrapper.makeCall().muteAudio();
 
+    handleMuteCall = (muted) => {
+        console.log(`Mute state changed to: ${muted}`);
+        pexrtcWrapper.muteAudio(muted);
+    };
+
+    handleHold = (onHold) => {
+        console.log(`Hold state changed to: ${onHold}`);
+        if (onHold) {
+            pexrtcWrapper.muteAllVideo(true);
+        } else {
+            pexrtcWrapper.muteAllVideo(false);
+            if (muteState) {
+                pexrtcWrapper.muteAudio(true);
+            }
+        }
+    };
+
+    handleEndCall = (disconnectAll) => {
+        console.log(`Ending call. Disconnect all: ${disconnectAll}`);
+        if (disconnectAll) {
+            pexrtcWrapper.disconnectAll();
+        } else {
+            pexrtcWrapper.disconnect();
+        }
+    };
 
     controller.createChannel()
     .then(_ => {
       return controller.addSubscription(
         `v2.users.${agent.id}.conversations.calls`,
-        (callEvent) => {
-          let agentParticipant = callEvent?.eventBody?.participants?.filter((p) => p.purpose == "agent")[0];
-          if (agentParticipant?.state === "disconnected") {
-            console.log("Agent has ended the call. Disconnecting all conference participants");
-            pexrtcWrapper.disconnectAll();
-          }
-        });
+        handleCallEvent);
     });
 
     clientApp.lifecycle.addStopListener(() => {
