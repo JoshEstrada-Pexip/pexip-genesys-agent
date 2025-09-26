@@ -108,7 +108,7 @@ client.loginImplicitGrant(
     let prefixedConfAlias = `${config.pexip.conferencePrefix}${confAlias}`;
 
     pexrtcWrapper = new PexRtcWrapper(videoElement, confNode, prefixedConfAlias, displayName, pin);
-    pexrtcWrapper.makeCall().muteAudio();
+    pexrtcWrapper.makeCall();
 
     handleMuteCall = (muted) => {
         console.log(`Mute state changed to: ${muted}`);
@@ -118,12 +118,11 @@ client.loginImplicitGrant(
     handleHold = (onHold) => {
         console.log(`Hold state changed to: ${onHold}`);
         if (onHold) {
-            pexrtcWrapper.muteAllVideo(true);
+            pexrtcWrapper.muteAudio(true);
+            pexrtcWrapper.muteVideo(true);
         } else {
-            pexrtcWrapper.muteAllVideo(false);
-            if (muteState) {
-                pexrtcWrapper.muteAudio(true);
-            }
+            pexrtcWrapper.muteVideo(false);
+            pexrtcWrapper.muteAudio(muteState);
         }
     };
 
@@ -135,6 +134,21 @@ client.loginImplicitGrant(
             pexrtcWrapper.disconnect();
         }
     };
+
+    const agentParticipant = conversation.participants?.find(p => p.purpose === "agent" && p.user?.id === agent.id);
+    if (agentParticipant) {
+        muteState = agentParticipant.muted ?? false;
+        onHoldState = agentParticipant.held ?? false;
+
+        console.log(`Initial mute state: ${muteState}`);
+        console.log(`Initial hold state: ${onHoldState}`);
+
+        if (onHoldState) {
+            handleHold(true);
+        } else {
+            handleMuteCall(muteState);
+        }
+    }
 
     controller.createChannel()
     .then(_ => {
