@@ -52,17 +52,25 @@ client.loginImplicitGrant(
     pexrtcWrapper.makeCall().muteAudio();
 
 
-    controller.createChannel()
-    .then(_ => {
+controller.createChannel().then((_) => {
       return controller.addSubscription(
         `v2.users.${agent.id}.conversations.calls`,
         (callEvent) => {
-          let agentParticipant = callEvent?.eventBody?.participants?.filter((p) => p.purpose == "agent")[0];
+          let agentParticipant = callEvent?.eventBody?.participants?.filter(
+            (p) => p.purpose == "agent"
+          )[0];
           if (agentParticipant?.state === "disconnected") {
-            console.log("Agent has ended the call. Disconnecting all conference participants");
+            console.log(
+              "Agent has ended the call. Disconnecting all conference participants"
+            );
             pexrtcWrapper.disconnectAll();
           }
-        });
+
+          let mute_state =
+            agentParticipant?.muted || agentParticipant?.held || false;
+          pexrtcWrapper.muteVideo(mute_state);
+        }
+      );
     });
 
     clientApp.lifecycle.addStopListener(() => {
