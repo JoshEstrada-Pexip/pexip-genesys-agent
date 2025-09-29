@@ -60,10 +60,18 @@ controller.createChannel().then((_) => {
             (p) => p.purpose == "agent"
           )[0];
           if (agentParticipant?.state === "disconnected") {
-            console.log(
-              "Agent has ended the call. Disconnecting all conference participants"
-            );
-            pexrtcWrapper.disconnectAll();
+            if (agentParticipant.disconnectType === "client") {
+              console.log(
+                "Agent has ended the call. Disconnecting all conference participants"
+              );
+              pexrtcWrapper.disconnectAll();
+            }
+            if (agentParticipant.disconnectType === "transfer") {
+              console.log(
+                "Agent is transferring the call. Only disconnecting the agent."
+              );
+              pexrtcWrapper.pexrtc.disconnect();
+            }
           }
 
           let mute_state =
