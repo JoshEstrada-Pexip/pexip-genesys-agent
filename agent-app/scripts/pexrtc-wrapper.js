@@ -59,34 +59,13 @@ export class PexRtcWrapper {
     return this;
   }
 
-  muteAudio(mute = true) {
-    this.pexrtc.muteAudio(mute);
-    return this;
-  }
-
-  muteVideo(mute = true) {
-    this.pexrtc.muteVideo(mute);
-    return this;
-  }
-
-  muteAllVideo(mute = true) {
-    const participants = this.pexrtc.rosterList || [];
-    participants.forEach(participant => {
-      if (participant.uuid) {
-        this.pexrtc.setParticipantMute(participant.uuid, mute);
-      }
-    });
-    this.muteVideo(mute);
+  muteAudio() {
+    this.pexrtc.muteAudio(true);
     return this;
   }
 
   disconnectAll() {
     this.pexrtc.disconnectAll();
-    return this;
-  }
-
-  disconnect() {
-    this.pexrtc.disconnect();
     return this;
   }
 }
