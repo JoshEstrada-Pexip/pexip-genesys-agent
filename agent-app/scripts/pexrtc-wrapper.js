@@ -53,6 +53,11 @@ export class PexRtcWrapper {
     this.pexrtc.onDisconnect = (...args) => this._disconnectHandler(...args);
   }
 
+  muteVideo(state = true) {
+    this.pexrtc.muteVideo(state);
+    return this;
+  }
+
   makeCall() {
     this.pexrtc.makeCall(
       this.confNode, this.confName, this.displayName, this.bandwidth);
