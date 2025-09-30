@@ -75,7 +75,7 @@ controller.createChannel().then((_) => {
           }
 
           let mute_state =
-            agentParticipant?.muted || agentParticipant?.held || false;
+            agentParticipant?.held || false;
           pexrtcWrapper.muteVideo(mute_state);
           if (mute_state === true) {
             videoElement.style["display"] = "none";
