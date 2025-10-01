@@ -1,9 +1,9 @@
-import controller from './notifications-controller.js';
-import config from './config.js';
-import {PexRtcWrapper} from './pexrtc-wrapper.js';
+import controller from "./notifications-controller.js";
+import config from "./config.js";
+import { PexRtcWrapper } from "./pexrtc-wrapper.js";
 
 // Obtain a reference to the platformClient object
-const platformClient = require('platformClient');
+const platformClient = require("platformClient");
 const client = platformClient.ApiClient.instance;
 
 // API instances
@@ -13,52 +13,64 @@ const conversationsApi = new platformClient.ConversationsApi();
 // Client App
 let ClientApp = window.purecloud.apps.ClientApp;
 let clientApp = new ClientApp({
-    pcEnvironment: config.genesys.region
+  pcEnvironment: config.genesys.region,
 });
 
-let conversationId = '';
+let conversationId = "";
 let agent = null;
 
 const urlParams = new URLSearchParams(window.location.search);
-conversationId = urlParams.get('conversationid');
+conversationId = urlParams.get("conversationid");
 
-const redirectUri = config.environment === 'development' ? 
-                      config.developmentUri : config.prodUri;
+const redirectUri =
+  config.environment === "development" ? config.developmentUri : config.prodUri;
 
 client.setEnvironment(config.genesys.region);
-client.loginImplicitGrant(
-    config.genesys.oauthClientID,
-    redirectUri,
-    { state: conversationId }
-)
-.then(data => {
+client
+  .loginImplicitGrant(config.genesys.oauthClientID, redirectUri, {
+    state: conversationId,
+  })
+  .then((data) => {
     conversationId = data.state;
     return usersApi.getUsersMe();
-}).then(currentUser => {
+  })
+  .then((currentUser) => {
     agent = currentUser;
     return conversationsApi.getConversation(conversationId);
-}).then((conversation) => {
+  })
+  .then((conversation) => {
     let videoElement = document.getElementById(config.videoElementId);
     let confNode = config.pexip.conferenceNode;
     let displayName = `Agent: ${agent.name}`;
     let pin = config.pexip.conferencePin;
-    let confAlias = conversation.participants?.filter((p) => p.purpose == "customer")[0]?.aniName;
+    let confAlias = conversation.participants?.filter(
+      (p) => p.purpose == "customer"
+    )[0]?.aniName;
 
     let conversationAgent = conversation.participants?.filter(
       (p) => p.purpose == "agent"
     )[0];
-    console.log({ conversationAgent });
-    let isTransfer = (conversationAgent.calls?.filter((c) => c.disconnectType === "transfer").length > 0);
-    console.log({ isTransfer });
+    console.log("PEXGEN: conversationAgent", conversationAgent);
+    let isTransfer =
+      conversationAgent.calls?.filter((c) => c.disconnectType === "transfer")
+        .length > 0;
+    console.log("PEXGEN: isTransfer", isTransfer);
 
     console.assert(confAlias, "Unable to determine the conference alias.");
 
     let prefixedConfAlias = `${config.pexip.conferencePrefix}${confAlias}`;
 
-    let pexrtcWrapper = new PexRtcWrapper(videoElement, confNode, prefixedConfAlias, displayName, pin);
+    let pexrtcWrapper = new PexRtcWrapper(
+      videoElement,
+      confNode,
+      prefixedConfAlias,
+      displayName,
+      pin
+    );
     pexrtcWrapper.makeCall().muteAudio();
 
     if (isTransfer === true) {
+      console.log("PEXGEN: Yes, this is a transfer!!!");
       pexrtcWrapper.muteVideo(true);
       videoElement.style["display"] = "none";
     }
@@ -74,6 +86,7 @@ client.loginImplicitGrant(
           let agentParticipant = callEvent?.eventBody?.participants?.filter(
             (p) => p.purpose == "agent"
           )[0];
+          console.log("PEXGEN: agentParticipant", agentParticipant);
           if (agentParticipant?.state === "disconnected") {
             if (agentParticipant.disconnectType === "client") {
               console.log(
@@ -89,13 +102,12 @@ client.loginImplicitGrant(
             }
           }
 
-          let mute_state =
-            agentParticipant?.held || false;
+          let mute_state = agentParticipant?.held || false;
+          console.log("PEXGEN: mute_state", mute_state, mute_state === true);
           pexrtcWrapper.muteVideo(mute_state);
           if (mute_state === true) {
             videoElement.style["display"] = "none";
-          }
-          else {
+          } else {
             videoElement.style["display"] = null;
           }
         }
@@ -108,7 +120,8 @@ client.loginImplicitGrant(
     }, true);
 
     return pexrtcWrapper;
-}).then(data => {
-    console.log('Finished Setup');
-
-}).catch(e => console.log(e));
+  })
+  .then((data) => {
+    console.log("Finished Setup");
+  })
+  .catch((e) => console.log(e));
