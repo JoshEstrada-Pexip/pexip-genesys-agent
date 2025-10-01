@@ -48,7 +48,7 @@ client.loginImplicitGrant(
       (p) => p.purpose == "agent"
     )[0];
     console.log({ conversationAgent });
-    let isTransfer = (conversationAgent.calls?.filter((c) => c.disconnectType === "transfer")[0] !== "undefined");
+    let isTransfer = (conversationAgent.calls?.filter((c) => c.disconnectType === "transfer").length > 0);
     console.log({ isTransfer });
 
     console.assert(confAlias, "Unable to determine the conference alias.");
