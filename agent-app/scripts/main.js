@@ -44,6 +44,14 @@ client.loginImplicitGrant(
     let pin = config.pexip.conferencePin;
     let confAlias = conversation.participants?.filter((p) => p.purpose == "customer")[0]?.aniName;
 
+    let conversationAgent = conversation.participants?.filter(
+      (p) => p.purpose == "agent"
+    )[0];
+    console.log({ conversationAgent });
+    let isAgentOnHold =
+      conversationAgent.calls?.filter((c) => c.held === true)[0]?.held || false;
+    console.log({ isAgentOnHold });
+
     console.assert(confAlias, "Unable to determine the conference alias.");
 
     let prefixedConfAlias = `${config.pexip.conferencePrefix}${confAlias}`;
@@ -51,8 +59,16 @@ client.loginImplicitGrant(
     let pexrtcWrapper = new PexRtcWrapper(videoElement, confNode, prefixedConfAlias, displayName, pin);
     pexrtcWrapper.makeCall().muteAudio();
 
+    if (isAgentOnHold === true) {
+      pexrtcWrapper.muteVideo(isAgentOnHold);
+      videoElement.style["display"] = "none";
+    }
 
-controller.createChannel().then((_) => {
+    if (window !== "undefined") {
+      window.pexrtcWrapper = pexrtcWrapper;
+    }
+
+    controller.createChannel().then((_) => {
       return controller.addSubscription(
         `v2.users.${agent.id}.conversations.calls`,
         (callEvent) => {
