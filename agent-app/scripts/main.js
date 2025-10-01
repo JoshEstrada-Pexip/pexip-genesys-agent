@@ -48,9 +48,8 @@ client.loginImplicitGrant(
       (p) => p.purpose == "agent"
     )[0];
     console.log({ conversationAgent });
-    let isAgentOnHold =
-      conversationAgent.calls?.filter((c) => c.held === true)[0]?.held || false;
-    console.log({ isAgentOnHold });
+    let isTransfer = (conversationAgent.calls?.filter((c) => c.disconnectType === "transfer")[0] !== "undefined");
+    console.log({ isTransfer });
 
     console.assert(confAlias, "Unable to determine the conference alias.");
 
@@ -59,8 +58,8 @@ client.loginImplicitGrant(
     let pexrtcWrapper = new PexRtcWrapper(videoElement, confNode, prefixedConfAlias, displayName, pin);
     pexrtcWrapper.makeCall().muteAudio();
 
-    if (isAgentOnHold === true) {
-      pexrtcWrapper.muteVideo(isAgentOnHold);
+    if (isTransfer === true) {
+      pexrtcWrapper.muteVideo(true);
       videoElement.style["display"] = "none";
     }
 
