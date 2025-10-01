@@ -65,15 +65,17 @@ client
       confNode,
       prefixedConfAlias,
       displayName,
-      pin
+      pin,
+      "1264",
+      isTransfer
     );
     pexrtcWrapper.makeCall().muteAudio();
 
-    if (isTransfer === true) {
-      console.log("PEXGEN: Yes, this is a transfer!!!");
-      pexrtcWrapper.muteVideo(true);
-      videoElement.style["display"] = "none";
-    }
+    // if (isTransfer === true) {
+    //   console.log("PEXGEN: Yes, this is a transfer!!!");
+    //   pexrtcWrapper.muteVideo(true);
+    //   videoElement.style["display"] = "none";
+    // }
 
     if (window !== "undefined") {
       window.pexrtcWrapper = pexrtcWrapper;
