@@ -11,23 +11,52 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
     <link rel="stylesheet" href="./styles/base.css">
     <link rel="stylesheet" href="./styles/video.css">
+    <style>
+      .main-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+    </style>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.3.0/purecloud-client-app-sdk.js"></script>
-    <script src="./scripts/pexrtc.js"></script>
-    <script type="module" src="./scripts/main.js"></script>
   </head>
   <body>
-    <div class="video-wrapper">
+    <div class="main-container">
+      <img src="./images/video-agent.png" alt="video-agent" width="200" height="200">
+      <button id="init-video" class="button is-primary is-large is-rounded" title="Escalate to Video">Escalate to Video</button>
+    </div>
+    <div class="video-wrapper" style="display: none;">
       <section class="section">
         <div class="container">
           <div style='overflow:auto' class="vidstage" id="viewport">
             <video id="pexip-video-container" playsinline="playsinline" poster="./images/orange-circle-loader.gif" class="mediastream" muted autoplay="autoplay"/><br>
           </div>
         </div>
-      </section>      
+      </section>
     </div>
+    <script>
+      let scriptsLoaded = false;
+      document.getElementById('init-video').addEventListener('click', () => {
+        if (!scriptsLoaded) {
+          document.querySelector('.main-container').style.display = 'none';
+          document.querySelector('.video-wrapper').style.display = 'block';
+          const pexRtcScript = document.createElement('script');
+          pexRtcScript.src = './scripts/pexrtc.js';
+          document.body.appendChild(pexRtcScript);
+
+          const mainScript = document.createElement('script');
+          mainScript.src = './scripts/main.js';
+          mainScript.type = 'module';
+          document.body.appendChild(mainScript);
+          scriptsLoaded = true;
+        }
+      });
+    </script>
   </body>
 </html>
