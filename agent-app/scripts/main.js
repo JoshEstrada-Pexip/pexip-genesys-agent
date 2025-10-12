@@ -36,6 +36,7 @@ client
   })
   .then((currentUser) => {
     agent = currentUser;
+    console.log("PEXGEN: conversationId before getConversation", conversationId);
     return conversationsApi.getConversation(conversationId);
   })
   .then((conversation) => {
@@ -66,7 +67,7 @@ client
       prefixedConfAlias,
       displayName,
       pin,
-      "1264",
+      "2021",
       isTransfer
     );
     pexrtcWrapper.makeCall().muteAudio();
